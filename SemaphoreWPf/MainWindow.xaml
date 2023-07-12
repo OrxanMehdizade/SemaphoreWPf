@@ -5,8 +5,30 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SemaphoreWPf"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="480" Width="830">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.3*"></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="0.4*"></RowDefinition>
+        </Grid.RowDefinitions>
 
+        <WrapPanel Grid.Row="0">
+            <TextBlock TextAlignment="Center" FontWeight="Bold" FontSize="20" Width="200" Height="50" Background="Aqua" Margin="40,15,72,15">Workin Threads</TextBlock>
+            <TextBlock TextAlignment="Center" FontWeight="Bold" FontSize="20" Width="200" Height="50" Background="Aqua" Margin="-7,0,70,0">Waiting Threads</TextBlock>
+            <TextBlock TextAlignment="Center" FontWeight="Bold" FontSize="20"  Width="200" Height="50" Background="Aqua" Margin="9,15,0,15">Created Threads</TextBlock>
+        </WrapPanel>
+
+        <WrapPanel Grid.Row="1">
+            <ListBox Width="240" Height="225" Margin="15" ></ListBox>
+            <ListBox Width="240" Height="225" Margin="15" ></ListBox>
+            <ListBox Width="240" Height="225" Margin="15" ></ListBox>
+        </WrapPanel>
+
+        <StackPanel Grid.Row="2">
+            <TextBlock Height="30" FontSize="18" Margin="10" FontWeight="Bold">Places In Semaphore</TextBlock>
+            <TextBox Width="100" Height="25" Margin="0,-12,644,0"></TextBox>
+            <Button Width="150" Height="35" FontSize="20" Background="Aqua" FontWeight="Bold" Margin="603,-10,0,0">Create New</Button>
+        </StackPanel>
     </Grid>
 </Window>

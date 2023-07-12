@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,4 +26,24 @@ namespace SemaphoreWPf
             InitializeComponent();
         }
     }
+
+    //public void Semaphorprint(string name, short İnitialCount_, short MaximumCount_)
+    //{
+    //    Semaphore semaphore = new Semaphore(İnitialCount_, MaximumCount_, name);
+
+    //}
+    //private void ButtonSpinner_Spin(
+    //    object sender, Microsoft.Windows.Controls.SpinEventArgs e)
+    //{
+    //    ButtonSpinner spinner = (ButtonSpinner)sender;
+    //    TextBox txtBox = (TextBox)spinner.Content;
+    //    int value = String.IsNullOrEmpty(txtBox.Text) ? 0 : Convert.ToInt32(txtBox.Text);
+    //    if (e.Direction == Windows.Controls.SpinDirection.Increase)
+    //        value++;
+    //    else
+    //    {
+    //        value--;
+    //    }
+    //    txtBox.Text = value.ToString();
+    //}
 }
