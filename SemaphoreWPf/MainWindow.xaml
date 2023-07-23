@@ -5,7 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SemaphoreWPf"
         mc:Ignorable="d"
-        mc: Background="Blue"
         Title="SemaphoreWpf" Height="480" Width="830">
     <Grid>
         <Grid.RowDefinitions>
