@@ -9,165 +9,162 @@ namespace SemaphoreWPf
 {
     public partial class MainWindow : Window
     {
-        private int serialNumber = 1; // İş parçacığı seri numarası
-        private List<string> createdThreads = new List<string>(); // Oluşturulan iş parçacıkları listesi
-        private List<string> workingThreads = new List<string>(); // Çalışan iş parçacıkları listesi
-        private List<string> waitingThreads = new List<string>(); // Bekleyen iş parçacıkları listesi
-        private Semaphore semaphore; // Semaphore nesnesi
-        private int semaphoreCount = 0; // Semaphore izin sayısı
+        private int ThreadNumber = 1;
+        private List<string> CreatedThreads = new List<string>(); //<<yaradilan Threadler siyahisi 
+        private List<string> WaitingThreads = new List<string>(); //<<gozliyen Threadler siyahisi
+        private List<string> WorkingThreads = new List<string>(); //<<isliyen  Threadler siyahisi
+        private Semaphore semaphore;
+        private int WorkingSemaphoreSize = 0;
 
         public MainWindow()
         {
             InitializeComponent();
-            semaphore = new Semaphore(0, int.MaxValue); // Başlangıçta 0 olarak ayarlanmış bir Semaphore oluşturulur
+            semaphore = new Semaphore(0, int.MaxValue);
         }
 
         private void CreateButton_Click(object sender, RoutedEventArgs e)
         {
-            string threadName = "Thread " + serialNumber; // Yeni iş parçacığı adı oluştur
-            createdThreads.Add(threadName); // Oluşturulan iş parçacığını listeye ekle
-
-            // Yeni iş parçacığını ilk liste (oluşturulan tüm konular) ListBox'ına ekle
+            string ThreadName = $"Thread {ThreadNumber}";
+            CreatedThreads.Add(ThreadName);
             ListBoxItem newItem = new ListBoxItem();
-            newItem.Content = threadName;
+            newItem.Content = ThreadName;
             CreatedThreadsListBox.Items.Add(newItem);
+            ThreadNumber++;
 
-            serialNumber++; // İş parçacığı seri numarasını artır
-
-            IncreaseSemaphoreCount(); // Semaphore izin sayısını artır
+            AddThreadsMethodlist(ThreadName);
         }
 
         private void WorkingThreadsListBox_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             ListBox listBox = (ListBox)sender;
-            ListBoxItem selectedItem = (ListBoxItem)listBox.SelectedItem;
-
-            if (selectedItem != null)
+            ListBoxItem secdiyimitem = (ListBoxItem)listBox.SelectedItem;
+            if (secdiyimitem != null)
             {
-                string threadName = selectedItem.Content.ToString();
-
-                if (waitingThreads.Contains(threadName))
+                string workingThreadName = secdiyimitem.Content.ToString();
+                if (WorkingThreads.Contains(workingThreadName))
                 {
-                    waitingThreads.Remove(threadName); // Bekleyen iş parçacığını listeden kaldır
+                    WorkingThreads.Remove(workingThreadName);
+                    listBox.Items.Remove(secdiyimitem);
+                    if (WaitingThreads.Count > 0)
+                    {
+                        string newThreadName = WaitingThreads[0];
+                        WaitingThreads.RemoveAt(0);
 
-                    // İş parçacığını çalışanlar listesine ekle
-                    ListBoxItem workingItem = new ListBoxItem();
-                    workingItem.Content = threadName;
-                    WorkingThreadsListBox.Items.Add(workingItem);
-                    workingThreads.Add(threadName);
+                        ListBoxItem workingItem = new ListBoxItem();
+                        workingItem.Content = newThreadName;
+                        WorkingThreadsListBox.Items.Add(workingItem);
+                        WorkingThreads.Add(newThreadName);
+                        SemaphoreSizeIncrementMethod();
+                    }
 
-                    DecreaseSemaphoreCount(); // Semaphore izin sayısını azalt
-
-                    CheckSemaphoreAvailability(); // Semaphore durumunu kontrol et
                 }
             }
+
         }
-
-
         private void CreatedThreadsListBox_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             ListBox listBox = (ListBox)sender;
-            ListBoxItem selectedItem = (ListBoxItem)listBox.SelectedItem;
-
-            if (selectedItem != null)
+            ListBoxItem secdiyimitem = (ListBoxItem)listBox.SelectedItem;
+            if (secdiyimitem != null)
             {
-                string threadName = selectedItem.Content.ToString();
-
-                if (createdThreads.Contains(threadName))
+                string CreatedThreadName = secdiyimitem.Content.ToString();
+                if (CreatedThreads.Contains(CreatedThreadName))
                 {
-                    createdThreads.Remove(threadName); // Oluşturulan iş parçacığını listeden kaldır
-
-                    // İş parçacığını bekleyenler listesine ekle
-                    ListBoxItem waitingItem = new ListBoxItem();
-                    waitingItem.Content = threadName;
-                    WaitingThreadsListBox.Items.Add(waitingItem);
-                    waitingThreads.Add(threadName);
-
-                    //CheckSemaphoreAvailability(); // Semaphore durumunu kontrol et
+                    CreatedThreads.Remove(CreatedThreadName);
+                    ListBoxItem gozliyenItem = new ListBoxItem();
+                    gozliyenItem.Content = CreatedThreadName;
+                    WaitingThreadsListBox.Items.Add(gozliyenItem);
+                    WaitingThreads.Add(CreatedThreadName);
                 }
+
             }
         }
-
         private void WaitingThreadsListBox_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             ListBox listBox = (ListBox)sender;
-            ListBoxItem selectedItem = (ListBoxItem)listBox.SelectedItem;
-
-            if (selectedItem != null)
+            ListBoxItem secdiyimitem = (ListBoxItem)listBox.SelectedItem;
+            if (secdiyimitem != null)
             {
-                string threadName = selectedItem.Content.ToString();
-
-                if (waitingThreads.Contains(threadName))
+                string WaitingThreadName = secdiyimitem.Content.ToString();
+                if (WaitingThreads.Contains(WaitingThreadName))
                 {
-                    waitingThreads.Remove(threadName); // Bekleyen iş parçacığını listeden kaldır
+                    WaitingThreads.Remove(WaitingThreadName);
+                    AddThreadsMethodlist(WaitingThreadName);
 
-                    // İş parçacığı kendini çalışanlar listesine eklesin
-                    ListBoxItem workingItem = new ListBoxItem();
-                    workingItem.Content = threadName;
-                    WorkingThreadsListBox.Items.Add(workingItem);
-                    workingThreads.Add(threadName);
 
-                    // İş parçacığı kendini çalışanlar listesine ekledikten sonra süreyle beklesin
-                    Timer timer = new Timer((state) =>
+
+                }
+            }
+
+        }
+        private void AddThreadsMethodlist(string ThreadName)
+        {
+            if (WorkingSemaphoreSize > 0)
+            {
+                ListBoxItem WorkingItem=new ListBoxItem();
+                WorkingItem.Content = ThreadName;
+                WorkingThreadsListBox.Items.Add(WorkingItem);
+                WorkingThreads.Add(ThreadName);
+                SemaphoreSizeDecrementMethod();
+            }
+            else
+            {
+                ListBoxItem WaitingItem= new ListBoxItem();
+                WaitingItem.Content = ThreadName;
+                WaitingThreadsListBox.Items.Add(WaitingItem);
+                WaitingThreads.Add(ThreadName);
+            }
+            Thread aftoThread = new Thread(() => { AftoThreadsMethodcheck(); });
+            aftoThread.Start();
+
+        }
+
+        private void AftoThreadsMethodcheck() 
+        {
+            while (WaitingThreads.Count > 0 && WorkingSemaphoreSize>0) 
+            {
+                var aftoThreadName = WaitingThreads[0];
+                Dispatcher.Invoke(() =>
+                {
+                    ListBoxItem secilenItem= WaitingThreadsListBox.ItemContainerGenerator.
+                    ContainerFromIndex(0) as ListBoxItem;
+                    if(secilenItem != null )
                     {
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            // Süre sonunda iş parçacığı kendini çalışanlar listesinden kaldırıp Semaphore izin sayısını artırsın
-                            WorkingThreadsListBox.Items.Remove(workingItem);
-                            workingThreads.Remove(threadName);
-
-                            IncreaseSemaphoreCount(); // Semaphore izin sayısını artır
-
-                            CheckSemaphoreAvailability(); // Semaphore durumunu kontrol et
-                        });
-                    }, null, TimeSpan.FromSeconds(1), Timeout.InfiniteTimeSpan);
-                }
+                        WaitingThreadsListBox.SelectedItem = secilenItem;
+                    }
+                });
+                Thread.Sleep(TimeSpan.FromSeconds(1));
+                Dispatcher.Invoke(() => { WorkingThreadsListBox_MouseDoubleClick(WaitingThreadsListBox, null); });
             }
+
+
         }
 
-        private void CheckSemaphoreAvailability()
+        public void SemaphoreSizeIncrementMethod()
         {
-            if (semaphoreCount > 0 && waitingThreads.Count > 0)
-            {
-                int threadsToMove = Math.Min(semaphoreCount, waitingThreads.Count);
+            WorkingSemaphoreSize++;
+            SemaphoreCountTextBox.Text=WorkingSemaphoreSize.ToString();
 
-                foreach (string threadName in waitingThreads.Take(threadsToMove).ToList())
-                {
-                    // Bekleyen iş parçacığını çalışanlar listesine taşı
-                    ListBoxItem workingItem = new ListBoxItem();
-                    workingItem.Content = threadName;
-                    WorkingThreadsListBox.Items.Add(workingItem);
-                    workingThreads.Add(threadName);
-
-                    waitingThreads.Remove(threadName);
-                    DecreaseSemaphoreCount(); // Semaphore izin sayısını azalt
-                }
-            }
         }
-
-        private void IncreaseSemaphoreCount()
+        public void SemaphoreSizeDecrementMethod()
         {
-            semaphoreCount++;
-            SemaphoreCountTextBox.Text = semaphoreCount.ToString();
-        }
-
-        private void DecreaseSemaphoreCount()
-        {
-            if (semaphoreCount > 0)
-            {
-                semaphoreCount--;
-                SemaphoreCountTextBox.Text = semaphoreCount.ToString();
-            }
+            WorkingSemaphoreSize--;
+            SemaphoreCountTextBox.Text = WorkingSemaphoreSize.ToString();
         }
 
         private void IncreaseButton_Click(object sender, RoutedEventArgs e)
         {
-            IncreaseSemaphoreCount();
+            SemaphoreSizeIncrementMethod();
         }
 
         private void DecreaseButton_Click(object sender, RoutedEventArgs e)
         {
-            DecreaseSemaphoreCount();
+            SemaphoreSizeDecrementMethod();
         }
+
+
+
+
+
     }
 }
